@@ -4,10 +4,12 @@
  */
 package com.mycompany.schoolman;
 
+import java.awt.HeadlessException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import javax.swing.JOptionPane;
 
 /**
@@ -61,6 +63,7 @@ public class Login extends javax.swing.JFrame {
 
         txt_upass.setFont(new java.awt.Font("Rockwell", 1, 18)); // NOI18N
 
+        login_btn.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
         login_btn.setText("Login");
         login_btn.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -68,6 +71,7 @@ public class Login extends javax.swing.JFrame {
             }
         });
 
+        register_btn.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
         register_btn.setText("Register");
         register_btn.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -75,6 +79,7 @@ public class Login extends javax.swing.JFrame {
             }
         });
 
+        cancel_btn.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
         cancel_btn.setText("Cancel");
         cancel_btn.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -92,15 +97,15 @@ public class Login extends javax.swing.JFrame {
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                         .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(cancel_btn))
+                    .addComponent(cancel_btn, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(txt_uname, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txt_upass, javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(register_btn)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(login_btn, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(txt_uname, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 185, Short.MAX_VALUE)
-                    .addComponent(txt_upass, javax.swing.GroupLayout.Alignment.LEADING))
+                        .addComponent(register_btn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(login_btn, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -114,11 +119,11 @@ public class Login extends javax.swing.JFrame {
                     .addComponent(jLabel2)
                     .addComponent(txt_upass, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(login_btn)
-                    .addComponent(register_btn)
-                    .addComponent(cancel_btn))
-                .addGap(0, 16, Short.MAX_VALUE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(register_btn, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(login_btn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(cancel_btn, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(35, 35, 35))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -149,29 +154,52 @@ public class Login extends javax.swing.JFrame {
     private void login_btnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_login_btnMouseClicked
         String uname = txt_uname.getText();
         char[] upass = txt_upass.getPassword();
-        try{
-            //register the oracle connection
-            //get the Driver class name
+
+        try {
+            // Register the Oracle driver
             Class.forName("oracle.jdbc.OracleDriver");
             String url = "jdbc:oracle:thin:@localhost:1521:ORA19";
             String username = "school_admin";
             String password = "admin";
             Connection conn = DriverManager.getConnection(url, username, password);
-            //create a string objectc of sql to check the username and password in database
-            String sqlquery = "SELECT * FROM LOGIN WHERE \"USER_NAME\" =? AND \"USER_PASS\" =?";
-            //prepare the sql suery
-            PreparedStatement pst = conn.prepareStatement (sqlquery);
+
+            // Prepare SQL query
+            String sqlquery = "SELECT IDNO, USER_ROLE FROM LOGIN WHERE \"USER_NAME\" = ? AND \"USER_PASS\" = ? AND \"VERIFIED\" = 'Y'";
+            PreparedStatement pst = conn.prepareStatement(sqlquery);
             pst.setString(1, uname);
             pst.setString(2, String.valueOf(upass));
+
             ResultSet rs = pst.executeQuery();
-            if(!rs.next()){ //if the username and password are incorrect
-               JOptionPane.showMessageDialog(null, "Username and Password are Incorrect.");
-            }else{
+
+            if (rs.next()) {  // Check if credentials match
+                int userId = rs.getInt("IDNO");  // Get user ID
+                String role = rs.getString("USER_ROLE");  // Get user role
                 JOptionPane.showMessageDialog(null, "Login Successful.");
-                this.dispose();
+
+                // Open interface based on role
+                switch (role.toLowerCase()) {
+                    case "admin" -> {
+                        AdminInterface adminInterface = new AdminInterface();
+                        adminInterface.setVisible(true);
+                    }
+                    case "teacher" -> {
+                        TeacherInterface teacherInterface = new TeacherInterface(userId);
+                        teacherInterface.setVisible(true);
+                    }
+                    case "student" -> {
+                        StudentInterface studentInterface = new StudentInterface(userId);
+                        studentInterface.setVisible(true);
+                    }
+                    default ->
+                        JOptionPane.showMessageDialog(null, "Unknown role: " + role, "Error", JOptionPane.ERROR_MESSAGE);
+                }
+                this.dispose(); // Close login form
+            } else {
+                // No matching credentials
+                JOptionPane.showMessageDialog(null, "Invalid credentials or account not verified.", "Login Error", JOptionPane.ERROR_MESSAGE);
             }
-        }catch(Exception e){
-            JOptionPane.showMessageDialog(null, e);
+        } catch (HeadlessException | ClassNotFoundException | SQLException e) {
+            JOptionPane.showMessageDialog(null, "An error occurred: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_login_btnMouseClicked
 

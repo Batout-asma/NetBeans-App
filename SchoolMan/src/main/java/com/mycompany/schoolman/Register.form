@@ -57,34 +57,29 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                      <Component id="jLabel7" max="32767" attributes="0"/>
+                      <Component id="jLabel5" alignment="0" max="32767" attributes="0"/>
+                      <Component id="jLabel4" alignment="1" max="32767" attributes="0"/>
+                      <Component id="jLabel3" alignment="0" max="32767" attributes="0"/>
+                      <Component id="jLabel1" alignment="0" max="32767" attributes="0"/>
+                      <Component id="jLabel2" alignment="0" max="32767" attributes="0"/>
+                      <Component id="jLabel6" alignment="0" max="32767" attributes="0"/>
+                  </Group>
+                  <EmptySpace type="separate" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
-                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                          <Component id="cancel_btn" min="-2" max="-2" attributes="0"/>
+                          <Component id="cancel_btn" max="32767" attributes="0"/>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
                           <Component id="register_btn" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <Group type="102" alignment="0" attributes="0">
-                          <Group type="103" groupAlignment="1" max="-2" attributes="0">
-                              <Component id="jLabel7" max="32767" attributes="0"/>
-                              <Component id="jLabel5" alignment="0" max="32767" attributes="0"/>
-                              <Component id="jLabel4" alignment="1" max="32767" attributes="0"/>
-                              <Component id="jLabel3" alignment="0" max="32767" attributes="0"/>
-                              <Component id="jLabel1" alignment="0" max="32767" attributes="0"/>
-                              <Component id="jLabel2" alignment="0" max="32767" attributes="0"/>
-                              <Component id="jLabel6" alignment="0" max="32767" attributes="0"/>
-                          </Group>
-                          <EmptySpace type="separate" max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="txt_id" alignment="0" max="32767" attributes="0"/>
-                              <Component id="txt_lname" alignment="1" max="32767" attributes="0"/>
-                              <Component id="txt_fname" alignment="0" max="32767" attributes="0"/>
-                              <Component id="jdc_bdate" alignment="0" pref="194" max="32767" attributes="0"/>
-                              <Component id="txt_uname" alignment="0" max="32767" attributes="0"/>
-                              <Component id="txt_upass" alignment="1" max="32767" attributes="0"/>
-                              <Component id="role_box" max="32767" attributes="0"/>
-                          </Group>
-                      </Group>
+                      <Component id="txt_id" alignment="0" max="32767" attributes="0"/>
+                      <Component id="txt_lname" alignment="1" max="32767" attributes="0"/>
+                      <Component id="txt_fname" alignment="0" max="32767" attributes="0"/>
+                      <Component id="jdc_bdate" alignment="0" pref="194" max="32767" attributes="0"/>
+                      <Component id="txt_uname" alignment="0" max="32767" attributes="0"/>
+                      <Component id="txt_upass" alignment="1" max="32767" attributes="0"/>
+                      <Component id="role_box" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -130,10 +125,9 @@
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="cancel_btn" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Component id="register_btn" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="cancel_btn" pref="35" max="32767" attributes="0"/>
+                      <Component id="register_btn" max="32767" attributes="0"/>
                   </Group>
-                  <EmptySpace max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -230,6 +224,9 @@
         </Component>
         <Component class="javax.swing.JButton" name="register_btn">
           <Properties>
+            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+              <Font name="Segoe UI" size="16" style="1"/>
+            </Property>
             <Property name="text" type="java.lang.String" value="Register"/>
           </Properties>
           <Events>
@@ -238,6 +235,9 @@
         </Component>
         <Component class="javax.swing.JButton" name="cancel_btn">
           <Properties>
+            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+              <Font name="Segoe UI" size="16" style="1"/>
+            </Property>
             <Property name="text" type="java.lang.String" value="Cancel"/>
           </Properties>
           <Events>
@@ -276,10 +276,11 @@
               <Font name="Rockwell" size="18" style="0"/>
             </Property>
             <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-              <StringArray count="3">
-                <StringItem index="0" value="Student"/>
-                <StringItem index="1" value="Teacher"/>
-                <StringItem index="2" value="Admin"/>
+              <StringArray count="4">
+                <StringItem index="0" value=" "/>
+                <StringItem index="1" value="Student"/>
+                <StringItem index="2" value="Teacher"/>
+                <StringItem index="3" value="Admin"/>
               </StringArray>
             </Property>
           </Properties>
