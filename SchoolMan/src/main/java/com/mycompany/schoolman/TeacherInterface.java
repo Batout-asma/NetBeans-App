@@ -166,39 +166,40 @@ public class TeacherInterface extends javax.swing.JFrame {
     }
 
     private void updateNote(String studentId, int teacherId, String newNote) {
-        final String sql = "UPDATE NOTE SET NOTE = ? WHERE N_EL = ? AND N_ENS = ?";
+    final String sql = "UPDATE NOTE SET NOTE = ?, SEEN = 0 WHERE N_EL = ? AND N_ENS = ?";
 
-        try (Connection conn = DriverManager.getConnection(
-                "jdbc:oracle:thin:@localhost:1521:ORA19",
-                "School_admin",
-                "admin"); PreparedStatement stmt = conn.prepareStatement(sql)) {
+    try (Connection conn = DriverManager.getConnection(
+            "jdbc:oracle:thin:@localhost:1521:ORA19",
+            "School_admin",
+            "admin"); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            // Ensure the new note is numeric
-            try {
-                Double.valueOf(newNote);  // Check if the new note is a valid number
-            } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(null, "Invalid note. Please enter a numeric value.", "Input Error", JOptionPane.ERROR_MESSAGE);
-                return;  // Stop if the note is invalid
-            }
-
-            // Set the query parameters
-            stmt.setDouble(1, Double.parseDouble(newNote));  // Update note value as double
-            stmt.setInt(2, Integer.parseInt(studentId));  // Set student ID as integer (N_EL)
-            stmt.setInt(3, teacherId);  // Set teacher ID (N_ENS) as integer
-
-            int rowsAffected = stmt.executeUpdate();
-
-            // Provide feedback to the user
-            if (rowsAffected > 0) {
-                JOptionPane.showMessageDialog(null, "Note updated successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(null, "Failed to update the note. No matching record found.", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error updating note: " + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
+        // Ensure the new note is numeric
+        try {
+            Double.valueOf(newNote);  // Check if the new note is a valid number
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "Invalid note. Please enter a numeric value.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            return;  // Stop if the note is invalid
         }
+
+        // Set the query parameters
+        stmt.setDouble(1, Double.parseDouble(newNote));  // Update note value as double
+        stmt.setInt(2, Integer.parseInt(studentId));  // Set student ID as integer (N_EL)
+        stmt.setInt(3, teacherId);  // Set teacher ID (N_ENS) as integer
+
+        int rowsAffected = stmt.executeUpdate();
+
+        // Provide feedback to the user
+        if (rowsAffected > 0) {
+            JOptionPane.showMessageDialog(null, "Note updated successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(null, "Failed to update the note. No matching record found.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(null, "Error updating note: " + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
     }
+}
+
 
     private void fetchStudentData(String studentId) {
         final String query = "SELECT * FROM ELEVE WHERE N_EL = ?";
@@ -267,7 +268,7 @@ public class TeacherInterface extends javax.swing.JFrame {
             }
 
             try {
-                Double.parseDouble(note);  // Check if note is a valid number
+                Double.valueOf(note);  // Check if note is a valid number
                 insertNoteIntoDatabase(nom, prenom, note);  // Insert the note into the database
                 addNoteDialog.dispose();  // Close the dialog after successful insertion
             } catch (NumberFormatException ex) {
@@ -284,72 +285,73 @@ public class TeacherInterface extends javax.swing.JFrame {
     }
 
     private void insertNoteIntoDatabase(String nom, String prenom, String note) {
-        // First, find the student's N_EL based on nom and prenom
-        final String studentQuery = "SELECT N_EL FROM ELEVE WHERE NOM = ? AND PRENOM = ?";
+    // First, find the student's N_EL based on nom and prenom
+    final String studentQuery = "SELECT N_EL FROM ELEVE WHERE NOM = ? AND PRENOM = ?";
 
-        try (Connection conn = DriverManager.getConnection(
-                "jdbc:oracle:thin:@localhost:1521:ORA19",
-                "School_admin",
-                "admin"); PreparedStatement stmt = conn.prepareStatement(studentQuery)) {
+    try (Connection conn = DriverManager.getConnection(
+            "jdbc:oracle:thin:@localhost:1521:ORA19",
+            "School_admin",
+            "admin"); PreparedStatement stmt = conn.prepareStatement(studentQuery)) {
 
-            stmt.setString(1, nom);
-            stmt.setString(2, prenom);
+        stmt.setString(1, nom);
+        stmt.setString(2, prenom);
 
-            ResultSet rs = stmt.executeQuery();
+        ResultSet rs = stmt.executeQuery();
 
-            if (rs.next()) {
-                String studentId = rs.getString("N_EL"); // Get the student ID (N_EL)
+        if (rs.next()) {
+            String studentId = rs.getString("N_EL"); // Get the student ID (N_EL)
 
-                // Insert the note into the NOTE table
-                insertNote(studentId, note);
-            } else {
-                JOptionPane.showMessageDialog(null, "Student not found with the provided name.", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error fetching student data: " + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
+            // Insert the note into the NOTE table
+            insertNote(studentId, note);
+        } else {
+            JOptionPane.showMessageDialog(null, "Student not found with the provided name.", "Error", JOptionPane.ERROR_MESSAGE);
         }
+
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(null, "Error fetching student data: " + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
     }
+}
 
-    private void insertNote(String studentId, String note) {
-        final String insertQuery = "INSERT INTO NOTE (N_EL, N_ENS, INTITULE_MODULE, NOTE) VALUES (?, ?, ?, ?)";
-        final String moduleQuery = "SELECT MODULE FROM ENSEIGNANT WHERE N_ENS = ?";
+private void insertNote(String studentId, String note) {
+    final String insertQuery = "INSERT INTO NOTE (N_EL, N_ENS, INTITULE_MODULE, NOTE, SEEN) VALUES (?, ?, ?, ?, ?)";
+    final String moduleQuery = "SELECT MODULE FROM ENSEIGNANT WHERE N_ENS = ?";
 
-        try (Connection conn = DriverManager.getConnection(
-                "jdbc:oracle:thin:@localhost:1521:ORA19",
-                "School_admin",
-                "admin"); PreparedStatement stmt = conn.prepareStatement(insertQuery); PreparedStatement stmt2 = conn.prepareStatement(moduleQuery)) {
+    try (Connection conn = DriverManager.getConnection(
+            "jdbc:oracle:thin:@localhost:1521:ORA19",
+            "School_admin",
+            "admin"); PreparedStatement stmt = conn.prepareStatement(insertQuery); PreparedStatement stmt2 = conn.prepareStatement(moduleQuery)) {
 
-            // Get the module name based on the teacher's ID (userId)
-            stmt2.setInt(1, userId);  // Set the teacher's ID (N_ENS)
-            ResultSet rs = stmt2.executeQuery();
+        // Get the module name based on the teacher's ID (userId)
+        stmt2.setInt(1, userId);  // Set the teacher's ID (N_ENS)
+        ResultSet rs = stmt2.executeQuery();
 
-            String moduleName = null;
-            if (rs.next()) {
-                moduleName = rs.getString("MODULE");  // Get the module name from the query result
-            } else {
-                JOptionPane.showMessageDialog(null, "Module not found for the teacher.", "Error", JOptionPane.ERROR_MESSAGE);
-                return;  // Exit if the module is not found
-            }
-
-            // Insert the new note into the NOTE table
-            stmt.setString(1, studentId);  // Set student ID (N_EL)
-            stmt.setInt(2, userId);  // Set teacher ID (N_ENS)
-            stmt.setString(3, moduleName);  // Set the module name
-            stmt.setDouble(4, Double.parseDouble(note));  // Set the note (convert to double)
-
-            int rowsAffected = stmt.executeUpdate();  // Execute the insert query
-
-            if (rowsAffected > 0) {
-                JOptionPane.showMessageDialog(null, "Note added successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(null, "Failed to add the note.", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error inserting note: " + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
+        String moduleName = null;
+        if (rs.next()) {
+            moduleName = rs.getString("MODULE");  // Get the module name from the query result
+        } else {
+            JOptionPane.showMessageDialog(null, "Module not found for the teacher.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;  // Exit if the module is not found
         }
+
+        // Insert the new note into the NOTE table, setting SEEN = 0
+        stmt.setString(1, studentId);  // Set student ID (N_EL)
+        stmt.setInt(2, userId);  // Set teacher ID (N_ENS)
+        stmt.setString(3, moduleName);  // Set the module name
+        stmt.setDouble(4, Double.parseDouble(note));  // Set the note (convert to double)
+        stmt.setInt(5, 0);  // Set SEEN = 0 for new notes
+
+        int rowsAffected = stmt.executeUpdate();  // Execute the insert query
+
+        if (rowsAffected > 0) {
+            JOptionPane.showMessageDialog(null, "Note added successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(null, "Failed to add the note.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(null, "Error inserting note: " + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
     }
+}
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -374,6 +376,7 @@ public class TeacherInterface extends javax.swing.JFrame {
         txt_grade = new javax.swing.JTextField();
         addNote_btn = new javax.swing.JButton();
         checkData_btn = new javax.swing.JButton();
+        logout_btn = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -486,13 +489,28 @@ public class TeacherInterface extends javax.swing.JFrame {
             }
         });
 
+        logout_btn.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
+        logout_btn.setText("Logout");
+        logout_btn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                logout_btnMouseClicked(evt);
+            }
+        });
+        logout_btn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                logout_btnActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 307, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 307, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(logout_btn, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
@@ -522,9 +540,6 @@ public class TeacherInterface extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(16, 16, 16)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(13, 13, 13)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(addNote_btn)
@@ -546,7 +561,11 @@ public class TeacherInterface extends javax.swing.JFrame {
                         .addGap(18, 18, 18)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(txt_grade, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(logout_btn)
+                        .addGap(11, 11, 11)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 246, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -612,6 +631,15 @@ public class TeacherInterface extends javax.swing.JFrame {
         openAddNoteDialog();
     }//GEN-LAST:event_addNote_btnMouseClicked
 
+    private void logout_btnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_logout_btnMouseClicked
+        this.hide();
+        new Login().show();
+    }//GEN-LAST:event_logout_btnMouseClicked
+
+    private void logout_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logout_btnActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_logout_btnActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -657,6 +685,7 @@ public class TeacherInterface extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JButton logout_btn;
     private javax.swing.JTable notes_table;
     private javax.swing.JTextField txt_fname;
     private javax.swing.JTextField txt_grade;

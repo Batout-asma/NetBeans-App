@@ -31,14 +31,15 @@ public class StudentInterface extends javax.swing.JFrame {
         StudentInterface.userId = userId;
         initComponents(); // Initialize GUI components
         loadStudentData(); // Load student personal data
-        loadNotesData();
+        loadNotesData(userId);
     }
 
     public void setUserId(int userId) {
         StudentInterface.userId = userId;
     }
 
-    private void loadNotesData() {
+
+    private void loadNotesData(int studentId) {
         final String query = "SELECT INTITULE_MODULE, NOTE FROM NOTE WHERE N_EL = ?";
 
         SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
@@ -50,7 +51,7 @@ public class StudentInterface extends javax.swing.JFrame {
                         "admin"); PreparedStatement stmt = conn.prepareStatement(query)) {
 
                     // Set the student ID parameter
-                    stmt.setInt(1, userId);
+                    stmt.setInt(1, studentId);
 
                     ResultSet rs = stmt.executeQuery();
                     DefaultTableModel model = (DefaultTableModel) notes_table.getModel();
@@ -151,6 +152,7 @@ public class StudentInterface extends javax.swing.JFrame {
         jLabel5 = new javax.swing.JLabel();
         jdc_bdate = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
+        update_btn2 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -179,6 +181,11 @@ public class StudentInterface extends javax.swing.JFrame {
 
         noti_btn.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
         noti_btn.setText("Notification");
+        noti_btn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                noti_btnMouseClicked(evt);
+            }
+        });
 
         jLabel6.setFont(new java.awt.Font("Rockwell", 1, 14)); // NOI18N
         jLabel6.setText("IdNumber:");
@@ -229,13 +236,28 @@ public class StudentInterface extends javax.swing.JFrame {
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel1.setText("Your Personal Data:");
 
+        update_btn2.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
+        update_btn2.setText("Logout");
+        update_btn2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                update_btn2MouseClicked(evt);
+            }
+        });
+        update_btn2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                logout_btn(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 244, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 244, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(update_btn2, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(38, 38, 38)
@@ -254,7 +276,7 @@ public class StudentInterface extends javax.swing.JFrame {
                                     .addComponent(jdc_bdate, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)))
                             .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING))
                         .addContainerGap(12, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                    .addGroup(jPanel1Layout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(noti_btn)
                         .addGap(14, 14, 14))))
@@ -267,9 +289,9 @@ public class StudentInterface extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txt_id, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txt_id, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -284,8 +306,9 @@ public class StudentInterface extends javax.swing.JFrame {
                     .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(38, 38, 38))
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(26, 26, 26)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(update_btn2)
+                .addGap(12, 12, 12)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 265, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -326,6 +349,19 @@ public class StudentInterface extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jdc_bdateActionPerformed
 
+    private void update_btn2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_update_btn2MouseClicked
+
+    }//GEN-LAST:event_update_btn2MouseClicked
+
+    private void logout_btn(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logout_btn
+        this.hide();
+        new Login().show();
+    }//GEN-LAST:event_logout_btn
+
+    private void noti_btnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_noti_btnMouseClicked
+        new NotifList(userId).show();
+    }//GEN-LAST:event_noti_btnMouseClicked
+
     /**
      * @param args the command line arguments
      */
@@ -354,10 +390,8 @@ public class StudentInterface extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new StudentInterface(userId).setVisible(true); // Example userId
-            }
+        java.awt.EventQueue.invokeLater(() -> {
+            new StudentInterface(userId).setVisible(true); // Example userId
         });
     }
 
@@ -375,5 +409,6 @@ public class StudentInterface extends javax.swing.JFrame {
     private javax.swing.JTextField txt_fname;
     private javax.swing.JTextField txt_id;
     private javax.swing.JTextField txt_lname;
+    private javax.swing.JButton update_btn2;
     // End of variables declaration//GEN-END:variables
 }
